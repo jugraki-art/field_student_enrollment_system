@@ -71,3 +71,66 @@ CREATE TABLE field_students (
 | TC-02 | Invalid Date Sequence| Start: 2026-08-10,<br> End: 2026-08-01 | Alert: "Ending day must be after Starting day" | PASS| 
 | TC-03 | Expired Field Period | Start: 2026-05-01,<br>End: 2026-07-01|Record added, Status = Completed |PASS| 
 
+Software Design Specification (SDS)1. System ArchitectureThe application follows a standard 3-Tier Architecture:Presentation Layer: Built using HTML5, CSS3, JavaScript (ES6+), and responsive UI layouts.  Application/API Layer: PHP execution environment exposing JSON API REST endpoints (api.php).  Data Layer: Relational MySQL database (kinondoni_pt_db) running on a local host server environment.  
+
++-------------------------------------------------------------+
+|                     PRESENTATION TIER                       |
+|  - Login Interface (login.html, login.js)                   |[cite: 6, 7]
+|  - Enrollment Form (add_enrollment.php)                     |[cite: 1, 9]
+|  - Records Dashboard (enrolled_list.php, report.php)        |[cite: 4, 9]
+|  - Client-Side Controller (app.js)                          |
++-------------------------------------------------------------+
+                              |
+                     JSON HTTP / REST API
+                              |
++-------------------------------------------------------------+
+|                      APPLICATION TIER                       |
+|  - REST API Routing & Controller (api.php)                  |
+|  - Input Sanitization (real_escape_string)                 |
+|  - Chronological Date Validation                            |
++-------------------------------------------------------------+
+                              |
+                         mysqli Query
+                              |
++-------------------------------------------------------------+
+|                         DATA TIER                           |
+|  - MySQL Database: kinondoni_pt_db                          |
+|  - Table: field_students                                    |[cite: 2]
++-------------------------------------------------------------+
+
+2. Module SpecificationsAuthentication & Authorization ModuleHandles session management via browser storage (sessionStorage).
+3. Restricts access to authorized Training Officers and IT staff members.  Session guards (checkAuth()) prevent unauthorized page access.
+4. Student Enrollment ModuleCaptures student personal information, academic institution, education level, and contact details.  Performs client-side validation for phone number length (10 digits) and chronological placement dates (endDate > startDate).
+5. Sends sanitized JSON payloads to the backend API via asynchronous HTTP POST requests.  Management & Reporting ModuleFetches and renders all enrolled field students ordered by insertion sequence (student_id DESC)[cite: 2].Dynamically calculates student training status (Active vs. Completed) based on current system date comparison with end_date.  Provides real-time name/institution filtering and client-side CSV data export capabilities.
+
+6. CREATE DATABASE IF NOT EXISTS kinondoni_pt_db;
+USE kinondoni_pt_db;
+
+CREATE TABLE IF NOT EXISTS field_students (
+    student_id INT AUTO_INCREMENT PRIMARY KEY,
+    full_name VARCHAR(255) NOT NULL,
+    institution VARCHAR(255) NOT NULL,
+    edu_level VARCHAR(50) NOT NULL,
+    year_of_study VARCHAR(50) NOT NULL,
+    start_date DATE NOT NULL,
+    end_date DATE NOT NULL,
+    phone_number VARCHAR(20) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+
+2. API Interface Contract (api.php)
+GET /api.php
+Description: Fetches all enrolled student records[cite: 2].
+
+Response Header: Content-Type: application/json
+
+[cite: 2]
+
+HTTP Status Codes: 200 OK, 500 Internal Server Error
+
+[cite: 2]
+
+JSON Output Structure:
+
+JSON
