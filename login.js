@@ -42,5 +42,5 @@ function checkAuth() {
 function logout() {
     sessionStorage.removeItem('isLoggedIn');
     sessionStorage.removeItem('loggedInUser');
-    window.location.href = 'login.html';
+    window.location.href = 'logout.php';
 }
