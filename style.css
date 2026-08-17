@@ -1,0 +1,510 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
+}
+
+body {
+    background-color: #f1f5f9;
+    color: #0f172a;
+    padding-bottom: 40px;
+}
+
+.navbar {
+        background-color: #1e293b;
+        color: #ffffff;
+        padding: 20px 30px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 4px solid #2563eb;
+        position: fixed; /* keep header visible while main content scrolls */
+        top: 0;
+        left: 250px; /* align with fixed sidebar */
+        right: 0;
+        height: 72px;
+        z-index: 1200; /* above sidebar */
+        transition: left 0.3s ease, width 0.3s ease;
+}
+
+.navbar h1 {
+    font-size: 1.4rem;
+    font-weight: 700;
+}
+
+.navbar p {
+    font-size: 0.85rem;
+    color: #94a3b8;
+    margin-top: 2px;
+}
+
+.user-badge {
+    
+    background-color: #334155;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    color: #38bdf8;
+    font-weight: 600;
+}
+
+.main-container {
+    max-width: 1200px;
+    margin: 30px auto;
+    padding: 0 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+}
+
+.card {
+    background: #ffffff;
+    padding: 24px;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+    border: 1px solid #e2e8f0;
+}
+
+.card h2 {
+    font-size: 1.15rem;
+    color: #1e293b;
+    margin-bottom: 18px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid #f1f5f9;
+}
+
+.req { color: #dc2626; }
+
+.form-group {
+    margin-bottom: 14px;
+}
+
+.form-row {
+    display: flex;
+    gap: 15px;
+}
+
+.form-row .form-group {
+    flex: 1;
+}
+
+label {
+    display: block;
+    font-size: 0.85rem;
+    font-weight: 600;
+    margin-bottom: 5px;
+    color: #475569;
+}
+
+input, select {
+    width: 100%;
+    padding: 9px 12px;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    transition: border-color 0.2s;
+}
+
+input:focus, select:focus {
+    outline: none;
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.btn {
+    padding: 10px 18px;
+    border: none;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.btn-primary {
+    background-color: #2563eb;
+    color: white;
+    width: 100%;
+    margin-top: 10px;
+}
+
+.btn-primary:hover {
+    background-color: #1d4ed8;
+}
+
+.btn-secondary {
+    background-color: #0f766e;
+    color: white;
+}
+
+.btn-secondary a {
+    color: white;
+    text-decoration: none;
+}
+
+.btn-secondary:hover {
+    background-color: #0d9488;
+}
+
+.btn-danger {
+    background-color: #ef4444;
+    color: white;
+    padding: 4px 10px;
+    font-size: 0.8rem;
+}
+
+.btn-danger:hover {
+    background-color: #dc2626;
+}
+
+.table-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.table-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.table-actions input {
+    width: 220px;
+}
+
+.table-wrapper {
+    overflow-x: auto;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.88rem;
+}
+
+th, td {
+    padding: 12px 14px;
+    text-align: left;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+th {
+    background-color: #f8fafc;
+    color: #475569;
+    font-weight: 600;
+}
+
+.status-badge {
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    display: inline-block;
+}
+
+.badge-active {
+    background-color: #dcfce7;
+    color: #15803d;
+}
+
+.badge-completed {
+    background-color: #f1f5f9;
+    color: #64748b;
+}
+ 
+
+/*Login Page Styles*/
+.login-body {
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+    display: flex;
+    justify-content: center; /* Centers horizontally */
+    align-items: center;     /* Centers vertically */
+    height: 100vh;           /* Forces exactly screen height */
+    margin: 0;               /* Removes default browser margins */
+    padding: 0;              /* ADD THIS: Overrides the global 40px padding-bottom */
+    overflow: hidden;        /* Prevents scrollbars from appearing */
+    box-sizing: border-box;
+}
+
+.login-card {
+    background: #ffffff;
+    width: 100%;
+    max-width: 400px;
+    padding: 32px;
+    border-radius: 12px;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+}
+
+.login-header {
+    text-align: center;
+    margin-bottom: 24px;
+}
+
+.login-header h2 {
+    font-size: 1.25rem;
+    color: #0f172a;
+    border: none;
+    margin-bottom: 4px;
+}
+
+.login-header p {
+    font-size: 0.85rem;
+    color: #64748b;
+}
+
+.login-alert {
+    background-color: #fef2f2;
+    border: 1px solid #fecaca;
+    color: #dc2626;
+    padding: 10px 12px;
+    border-radius: 6px;
+    font-size: 0.82rem;
+    margin-bottom: 16px;
+    text-align: center;
+}
+
+.login-footer {
+    text-align: center;
+    margin-top: 20px;
+    font-size: 0.8rem;
+    color: #64748b;
+    border-top: 1px solid #f1f5f9;
+    padding-top: 15px;
+}
+
+.user-badge-area {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.btn-logout {
+    background-color: #dc2626;
+    color: white;
+    padding: 6px 12px;
+    font-size: 0.8rem;
+}
+
+.btn-logout:hover {
+    background-color: #b91c1c;
+}
+
+/* ==========================================================================
+   Vertical Sidebar Layout
+   ========================================================================== */
+.app-layout {
+    display: flex;
+    height: 100vh; /* keep layout full-height and avoid page scrolling */
+    overflow: hidden; /* let main-content handle scrolling */
+}
+
+/* Sidebar Styles */
+.sidebar {
+    width: 250px;
+    background-color: #0f172a;
+    color: #ffffff;
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+    border-right: 1px solid #1e293b;
+    position: fixed; /* keep sidebar unaffected by content scrolling */
+    top: 0;
+    left: 0;
+    height: 100vh;
+    z-index: 1000;
+    overflow: auto; /* allow sidebar content to scroll if it grows */
+}
+
+.sidebar-header {
+    padding: 24px 20px;
+    background-color: #1e293b;
+    border-bottom: 3px solid #2563eb;
+}
+
+.sidebar-header h2 {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #ffffff;
+    border: none;
+    margin-bottom: 2px;
+}
+
+.sidebar-header p {
+    font-size: 0.8rem;
+    color: #94a3b8;
+}
+
+.sidebar-menu {
+    display: flex;
+    flex-direction: column;
+    padding: 20px 0;
+    height: 100%;
+}
+
+.nav-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 20px;
+    color: #94a3b8;
+    text-decoration: none;
+    font-size: 0.9rem;
+    font-weight: 600;
+    transition: all 0.2s ease;
+    border: none;
+    background: transparent;
+    width: 100%;
+    text-align: left;
+    cursor: pointer;
+}
+
+.nav-item:hover, 
+.nav-item.active {
+    background-color: #1e293b;
+    color: #38bdf8;
+    border-left: 4px solid #2563eb;
+}
+
+.nav-icon {
+    font-size: 1.1rem;
+}
+
+.btn-sidebar-logout {
+    margin-top: auto;
+    color: #f87171;
+    border-top: 1px solid #1e293b;
+}
+
+.btn-sidebar-logout:hover {
+    background-color: #450a0a;
+    color: #fca5a5;
+    border-left: 4px solid #ef4444;
+}
+
+/* Main Content Adjustments */
+.main-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    background-color: #f1f5f9;
+    min-width: 0; /* Prevents overflow bugs in flex children */
+    margin-left: 250px; /* leave space for the fixed sidebar */
+    height: 100vh;
+    overflow: auto; /* make main area scrollable independently */
+    padding-top: 72px; /* avoid header overlap */
+    transition: margin-left 0.3s ease, padding-top 0.3s ease;
+}
+
+/* Responsive adjustments for mobile screens */
+@media (max-width: 768px) {
+    .app-layout {
+        flex-direction: column;
+    }
+    
+    .sidebar {
+        width: 100%;
+        height: auto;
+        position: relative;
+    }
+
+    .navbar {
+        left: 0;
+        right: 0;
+        width: 100%;
+        position: fixed;
+        z-index: 1200;
+    }
+    
+    .sidebar-menu {
+        flex-direction: row;
+        overflow-x: auto;
+        padding: 10px 0;
+    }
+    
+    .btn-sidebar-logout {
+        margin-top: 0;
+    }
+}
+
+/* When sidebar is collapsed, navbar should expand to full width */
+.app-layout.sidebar-closed .navbar {
+    left: 0;
+    width: 100%;
+}
+
+/* Sidebar Smooth Transition */
+.sidebar {
+    transition: width 0.3s ease, margin-left 0.3s ease, padding 0.3s ease;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+/* Collapsed State */
+.app-layout.sidebar-closed .sidebar {
+    width: 0;
+    padding: 0;
+    margin-left: 0;
+    border: none;
+    left: 0; /* remain fixed at left even when collapsed */
+}
+
+.app-layout.sidebar-closed .main-content {
+    margin-left: 0; /* reclaim space when sidebar collapsed */
+}
+
+/* Sidebar Toggle Button */
+.btn-toggle {
+    position: fixed;
+    top: 14px; /* vertically center inside 72px navbar */
+    left: calc(250px + 16px); /* position near navbar left edge when sidebar open */
+    z-index: 1300; /* above navbar so toggle remains clickable */
+    background-color: #334155;
+    color: #ffffff;
+    border: none;
+    font-size: 1.2rem;
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: left 0.3s ease, background 0.2s ease, transform 0.2s ease;
+    box-shadow: 0 4px 10px rgba(15, 23, 42, 0.2);
+}
+
+.btn-toggle:hover {
+    background-color: #2563eb;
+    transform: translateY(-1px);
+}
+
+/* When sidebar is collapsed the toggle moves to the left edge */
+.app-layout.sidebar-closed .btn-toggle {
+    left: 16px;
+}
+
+@media (max-width: 768px) {
+    .btn-toggle {
+        left: 16px; /* keep toggle at left on small screens */
+        top: 14px;
+    }
+}
+
+/* Toggle icon sizing */
+.btn-toggle .toggle-icon {
+    width: 20px;
+    height: 20px;
+    fill: none;
+    stroke: #ffffff;
+    stroke-width: 0;
+    color: #ffffff;
+    display: block;
+    margin: 0 auto;
+}
+
+/* Slight hover change to icon color */
+.btn-toggle:hover .toggle-icon rect {
+    fill: #ffffff;
+}

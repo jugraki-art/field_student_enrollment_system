@@ -1,0 +1,99 @@
+
+         <?php 
+         require_once __DIR__ . '/nav.php';
+         require_once __DIR__ . '/header.php';
+         ?>
+
+ 
+
+        <div class="main-content">
+            <div class="main-container">
+                <!-- Dynamic Records Table 
+                <section class="card table-card">
+                    <div class="table-header">
+                        <h2>Enrolled Field Students Records</h2>
+                        <div class="table-actions">
+                            <input type="text" id="searchInput" placeholder="Search by name or uni..." onkeyup="filterTable()">
+                            <button class="btn btn-secondary" onclick="exportCSV()">Export CSV</button>
+                        </div>
+                    </div>
+
+                    <div class="table-wrapper">
+                        <table id="recordsTable">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Institution</th>
+                                    <th>Level/Year</th>
+                                    <th>Training Period</th>
+                                    <th>Contact</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="studentTableBody">
+                                - JavaScript injects dynamic rows here --
+                            </tbody>
+                        </table>
+                    </div>
+                </section>-->
+
+                <!-- Enrollment Form -->
+            <section class="card form-card">
+                <h2>Enroll New Field Student</h2>
+                <form id="enrollmentForm">
+                    <div class="form-group">
+                        <label for="fullName">Full Name <span class="req">*</span></label>
+                        <input type="text" id="fullName" required placeholder="e.g. Juma Rashidi">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="institution">Uni / Institute / College <span class="req">*</span></label>
+                        <input type="text" id="institution" required placeholder="e.g. UDSM, DIT, IFM, CBE">
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="eduLevel">Level of Education <span class="req">*</span></label>
+                            <select id="eduLevel" required>
+                                <option value="Certificate">Certificate</option>
+                                <option value="Diploma">Diploma</option>
+                                <option value="Degree" selected>Degree</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="yearOfStudy">Year of Study <span class="req">*</span></label>
+                            <select id="yearOfStudy" required>
+                                <option value="Year 1">Year 1</option>
+                                <option value="Year 2" selected>Year 2</option>
+                                <option value="Year 3">Year 3</option>
+                                <option value="Year 4">Year 4</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="startDate">Starting Day <span class="req">*</span></label>
+                            <input type="date" id="startDate" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="endDate">Ending Day <span class="req">*</span></label>
+                            <input type="date" id="endDate" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="phone">Contact Phone Info <span class="req">*</span></label>
+                        <input type="tel" id="phone" required placeholder="e.g. 0712345678">
+                    </div>
+
+                    <button type="submit" id="btnSubmit" class="btn btn-primary">Enroll Student</button>
+                </form>
+            </section>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
