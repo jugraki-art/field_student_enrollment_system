@@ -14,6 +14,14 @@
        
         <div class="main-content">
             <header class="navbar">
+                <button id="sidebarToggle" class="btn-toggle" aria-label="Toggle Navigation" aria-expanded="true">
+                    <svg class="toggle-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                        <rect x="3" y="6" width="18" height="2" rx="1"></rect>
+                        <rect x="3" y="11" width="18" height="2" rx="1"></rect>
+                        <rect x="3" y="16" width="18" height="2" rx="1"></rect>
+                    </svg>
+                </button>
+                <div></div>
                 <div class="logo-area">
                     <h1>Field Student Enrollment Portal</h1>
                     <p>Kinondoni Municipal Council HQ - IT Department</p>
@@ -31,7 +39,7 @@
                         Use the navigation panel to start enrollment, review records, or sign out securely.
                     </p>
                     <div style="display: flex; gap: 12px; flex-wrap: wrap;">
-                        <a href="index.html" class="btn btn-primary" style="width: auto; margin-top: 0; text-decoration: none; display: inline-block;">Enroll Student</a>
+                        <a href="report.php" class="btn btn-primary" style="width: auto; margin-top: 0; text-decoration: none; display: inline-block;">Enroll Student</a>
                         <a href="index.html#recordsTable" class="btn btn-secondary" style="text-decoration: none; display: inline-block;">View Records</a>
                     </div>
                 </section>

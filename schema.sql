@@ -21,11 +21,12 @@ CREATE TABLE IF NOT EXISTS users (
     user_id INT AUTO_INCREMENT PRIMARY KEY,
     username VARCHAR(50) NOT NULL UNIQUE,
     password_hash VARCHAR(255) NOT NULL,
-    role VARCHAR(50) DEFAULT 'Training Officer',
+    position VARCHAR(50) DEFAULT 'Training Officer',
+    phone_number VARCHAR(20) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 INSERT INTO users
-   (username, password_hash)
+   (username, password_hash, position, phone_number)
    values
-   ('admin', 'admin123'); -- Replace with a secure hashed password in production
+   ('admin', 'admin123', 'Admin', '0712345678'); -- Replace with a secure hashed password in production
