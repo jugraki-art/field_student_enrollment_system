@@ -1,61 +1,104 @@
-// Field Student Enrollment System - Frontend Logic
+// Field Student Enrollment System - Main Client-Side Logic (app.js)
+
+let currentStudentsList = [];
 
 document.addEventListener('DOMContentLoaded', () => {
-    loadStudents();
+    // Run authentication check first
+    if (typeof checkAuth === 'function') {
+        checkAuth();
+    }
 
+    // Populate user badge in header if element exists
+    const badgeName = document.getElementById('userBadgeName');
+    if (badgeName) {
+        const loggedUser = sessionStorage.getItem('loggedInUser') || 'Training Officer';
+        badgeName.textContent = loggedUser;
+    }
+
+    // Initialize students list if table present on page
+    if (document.getElementById('studentTableBody')) {
+        loadStudents();
+    }
+
+    // Initialize enrollment form submit listener
     const form = document.getElementById('enrollmentForm');
     if (form) {
         form.addEventListener('submit', handleFormSubmit);
     }
+
+    // Setup sidebar navigation collapse toggle & state persistence
+    setupSidebarToggle();
 });
 
-// Load students from API, falling back to LocalStorage when needed
+// Load students from API asynchronously, falling back to LocalStorage on error
 async function loadStudents() {
     const tbody = document.getElementById('studentTableBody');
     if (!tbody) return;
 
     try {
-        const response = await fetch('api.php');
+        const response = await fetch('api.php?action=students');
         if (!response.ok) {
             throw new Error(`API fetch failed with status ${response.status}`);
         }
 
         const students = await response.json();
-        renderTable(Array.isArray(students) ? students : []);
+        if (Array.isArray(students)) {
+            currentStudentsList = students;
+            // Update LocalStorage cache for offline fallback
+            localStorage.setItem('field_students', JSON.stringify(students));
+            renderTable(students);
+        } else {
+            throw new Error('API did not return a valid list array');
+        }
     } catch (error) {
-        console.error('Unable to load students from API:', error);
-        const students = JSON.parse(localStorage.getItem('field_students')) || [];
-        renderTable(students);
+        console.warn('Unable to load students from API, using LocalStorage fallback:', error);
+        const cached = JSON.parse(localStorage.getItem('field_students')) || [];
+        currentStudentsList = cached;
+        renderTable(cached);
     }
 }
 
-// Render Data Table
+// Render Data Table dynamically into #studentTableBody
 function renderTable(students) {
     const tbody = document.getElementById('studentTableBody');
+    if (!tbody) return;
+
     tbody.innerHTML = '';
 
-    const today = new Date().setHours(0, 0, 0, 0);
+    // Calculate today's date normalized to 00:00:00 for active state comparison
+    const now = new Date();
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
 
-    if (students.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; color:#94a3b8; padding:20px;">No field students enrolled yet.</td></tr>`;
+    if (!Array.isArray(students) || students.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; color:#94a3b8; padding:30px;">No field students enrolled yet.</td></tr>`;
         return;
     }
 
     students.forEach((student, index) => {
+        const id = student.student_id || student.id || (index + 1);
         const fullName = escapeHtml(student.fullName || student.full_name || '');
         const institution = escapeHtml(student.institution || '');
-        const eduLevel = student.eduLevel || student.edu_level || '';
-        const yearOfStudy = student.yearOfStudy || student.year_of_study || '';
+        const eduLevel = escapeHtml(student.eduLevel || student.edu_level || '');
+        const yearOfStudy = escapeHtml(student.yearOfStudy || student.year_of_study || '');
         const startDate = student.startDate || student.start_date || '';
         const endDate = student.endDate || student.end_date || '';
         const phone = escapeHtml(student.phone || student.phone_number || '');
 
-        const endDateValue = endDate ? new Date(endDate).setHours(0, 0, 0, 0) : today - 1;
-        const isActive = today <= endDateValue;
+        // Calculate Active State: today <= endDate
+        let isActive = false;
+        if (endDate) {
+            const parts = endDate.split('-');
+            if (parts.length === 3) {
+                const endTimestamp = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2])).getTime();
+                isActive = today <= endTimestamp;
+            } else {
+                isActive = today <= new Date(endDate).getTime();
+            }
+        }
+
         const statusText = isActive ? 'Active' : 'Completed';
         const badgeClass = isActive ? 'badge-active' : 'badge-completed';
 
-        const id = student.student_id || student.id || '';
         const row = document.createElement('tr');
         row.innerHTML = `
             <td><strong>${fullName}</strong></td>
@@ -64,51 +107,59 @@ function renderTable(students) {
             <td><small>${startDate} to ${endDate}</small></td>
             <td>${phone}</td>
             <td><span class="status-badge ${badgeClass}">${statusText}</span></td>
-            <td><button class="btn btn-danger btn-delete">Delete</button></td>
+            <td>
+                <button class="btn btn-danger btn-delete" data-id="${id}" data-index="${index}">Delete</button>
+            </td>
         `;
-        // attach delete handler that targets this student's id (if available) or index fallback
+
         tbody.appendChild(row);
+
         const delBtn = row.querySelector('.btn-delete');
         if (delBtn) {
-            delBtn.addEventListener('click', () => deleteStudent(id || null, index));
+            delBtn.addEventListener('click', () => deleteStudent(id, index));
         }
     });
 }
 
-// Handle Form Submission with Validation
+// Handle Form Submission with Strict Validations
 async function handleFormSubmit(e) {
     e.preventDefault();
 
-    const fullName = document.getElementById('fullName').value.trim();
-    const institution = document.getElementById('institution').value.trim();
-    const eduLevel = document.getElementById('eduLevel').value;
-    const yearOfStudy = document.getElementById('yearOfStudy').value;
-    const startDate = document.getElementById('startDate').value;
-    const endDate = document.getElementById('endDate').value;
-    const phone = document.getElementById('phone').value.trim();
+    const fullNameInput = document.getElementById('fullName');
+    const institutionInput = document.getElementById('institution');
+    const eduLevelInput = document.getElementById('eduLevel');
+    const yearOfStudyInput = document.getElementById('yearOfStudy');
+    const startDateInput = document.getElementById('startDate');
+    const endDateInput = document.getElementById('endDate');
+    const phoneInput = document.getElementById('phone');
 
-    // System Logic Rule 1: End Date > Start Date
+    const fullName = fullNameInput ? fullNameInput.value.trim() : '';
+    const institution = institutionInput ? institutionInput.value.trim() : '';
+    const eduLevel = eduLevelInput ? eduLevelInput.value : '';
+    const yearOfStudy = yearOfStudyInput ? yearOfStudyInput.value : '';
+    const startDate = startDateInput ? startDateInput.value : '';
+    const endDate = endDateInput ? endDateInput.value : '';
+    const phone = phoneInput ? phoneInput.value.trim() : '';
+
+    if (!fullName || !institution || !startDate || !endDate || !phone) {
+        showAlert('formAlert', 'Please fill in all required form fields.', 'error');
+        return;
+    }
+
+    // Validation 1: End Date > Start Date
     if (new Date(endDate) <= new Date(startDate)) {
         alert('SDLC Validation Error: Ending day must be chronological after the Starting day.');
+        showAlert('formAlert', 'Validation Error: End date must be after start date.', 'error');
         return;
     }
 
-    // System Logic Rule 2: Phone Number Validation (10 digits)
-    if (!/^[0-9]{10}$/.test(phone.replace(/\s+/g, ''))) {
+    // Validation 2: Phone Number Validation (10 digits)
+    const sanitizedPhone = phone.replace(/\s+/g, '');
+    if (!/^[0-9]{10}$/.test(sanitizedPhone)) {
         alert('Validation Error: Please enter a valid 10-digit phone number.');
+        showAlert('formAlert', 'Validation Error: Please enter a valid 10-digit phone number (e.g. 0712345678).', 'error');
         return;
     }
-
-    const newStudent = {
-        id: Date.now(),
-        fullName,
-        institution,
-        eduLevel,
-        yearOfStudy,
-        startDate,
-        endDate,
-        phone
-    };
 
     const payload = {
         fullName,
@@ -117,7 +168,7 @@ async function handleFormSubmit(e) {
         yearOfStudy,
         startDate,
         endDate,
-        phone
+        phone: sanitizedPhone
     };
 
     try {
@@ -127,112 +178,145 @@ async function handleFormSubmit(e) {
             body: JSON.stringify(payload)
         });
 
-        if (!response.ok) {
-            throw new Error(`API request failed with status ${response.status}`);
-        }
-
         const result = await response.json();
-        if (result.status === 'success') {
-            alert(result.message);
+
+        if (response.ok && result.status === 'success') {
+            alert(result.message || 'Student enrolled successfully.');
+            showAlert('formAlert', result.message || 'Student enrolled successfully.', 'success');
+            
+            // Reset form fields
             document.getElementById('enrollmentForm').reset();
-            loadStudents();
+
+            // Redirect to enrolled list view after successful enrollment
+            setTimeout(() => {
+                window.location.href = 'enrolled_list.php';
+            }, 800);
         } else {
-            throw new Error(result.message || 'API error');
+            throw new Error(result.message || 'Error processing enrollment');
         }
     } catch (error) {
-        console.error('Failed to save enrollment to API:', error);
-        alert('Unable to save to database. Please try again later.');
+        console.warn('API enrollment post failed, caching locally:', error);
+        
+        // Save to LocalStorage fallback
+        const newRecord = {
+            id: Date.now(),
+            student_id: Date.now(),
+            fullName,
+            institution,
+            eduLevel,
+            yearOfStudy,
+            startDate,
+            endDate,
+            phone: sanitizedPhone,
+            createdAt: new Date().toISOString()
+        };
+
+        const students = JSON.parse(localStorage.getItem('field_students')) || [];
+        students.unshift(newRecord);
+        localStorage.setItem('field_students', JSON.stringify(students));
+
+        alert('Student enrolled locally (Offline fallback mode).');
+        document.getElementById('enrollmentForm').reset();
+        window.location.href = 'enrolled_list.php';
     }
 }
 
-// Delete Record
-function deleteStudent(index) {
-    // legacy signature: deleteStudent(id, index)
-    // when called with only one numeric arg (old code), treat it as index
-    let id = null;
-    let idx = null;
-    if (arguments.length === 1) {
-        idx = arguments[0];
-    } else {
-        id = arguments[0];
-        idx = arguments[1];
-    }
-
-    if (!confirm('Are you sure you want to remove this record?')) return;
-
-    // If we have an id, attempt server-side delete
-    if (id) {
-        fetch('api.php?id=' + encodeURIComponent(id), { method: 'DELETE' })
-            .then(resp => resp.json())
-            .then(result => {
-                if (result.status === 'success') {
-                    alert('Record deleted from database.');
-                    loadStudents();
-                } else {
-                    // fallback to local delete if API returns error
-                    console.error('API delete failed:', result);
-                    alert('Unable to delete from server: ' + (result.message || 'Unknown error'));
-                    // optionally remove from localStorage if present
-                    const students = JSON.parse(localStorage.getItem('field_students')) || [];
-                    if (idx !== null && idx >= 0 && idx < students.length) {
-                        students.splice(idx, 1);
-                        localStorage.setItem('field_students', JSON.stringify(students));
-                        renderTable(students);
-                    } else {
-                        loadStudents();
-                    }
-                }
-            })
-            .catch(err => {
-                console.error('Network/API error while deleting:', err);
-                // fallback to localStorage
-                const students = JSON.parse(localStorage.getItem('field_students')) || [];
-                if (idx !== null && idx >= 0 && idx < students.length) {
-                    students.splice(idx, 1);
-                    localStorage.setItem('field_students', JSON.stringify(students));
-                    renderTable(students);
-                    alert('Deleted locally (server not reachable).');
-                } else {
-                    alert('Delete failed and no local fallback available.');
-                }
-            });
+// Handle Delete Student Record cleanly with API DELETE call and confirmation prompt
+async function deleteStudent(id, index) {
+    if (!confirm('Are you sure you want to remove this field student record?')) {
         return;
     }
 
-    // No id: operate on localStorage using index
-    if (idx !== null) {
-        const students = JSON.parse(localStorage.getItem('field_students')) || [];
-        students.splice(idx, 1);
+    try {
+        // Perform server-side HTTP DELETE call to api.php
+        const response = await fetch(`api.php?id=${encodeURIComponent(id)}`, {
+            method: 'DELETE',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id: id })
+        });
+
+        const result = await response.json();
+
+        if (response.ok && result.status === 'success') {
+            alert('Record deleted successfully.');
+            loadStudents();
+        } else {
+            throw new Error(result.message || 'Failed to delete record from server');
+        }
+    } catch (error) {
+        console.warn('API delete failed, updating local state:', error);
+        
+        // LocalStorage fallback deletion
+        let students = JSON.parse(localStorage.getItem('field_students')) || currentStudentsList;
+        students = students.filter(s => (s.student_id || s.id) != id);
+        
+        if (typeof index === 'number' && index >= 0 && index < students.length) {
+            students.splice(index, 1);
+        }
+
         localStorage.setItem('field_students', JSON.stringify(students));
+        currentStudentsList = students;
         renderTable(students);
+        alert('Record deleted locally.');
     }
 }
 
-// Search / Filter
+// Real-Time Search & Filter Table Logic
 function filterTable() {
-    const input = document.getElementById('searchInput').value.toLowerCase();
-    const students = JSON.parse(localStorage.getItem('field_students')) || [];
-    
-    const filtered = students.filter(s => 
-        s.fullName.toLowerCase().includes(input) || 
-        s.institution.toLowerCase().includes(input)
-    );
-    
+    const searchInput = document.getElementById('searchInput');
+    if (!searchInput) return;
+
+    const query = searchInput.value.toLowerCase().trim();
+    if (!query) {
+        renderTable(currentStudentsList);
+        return;
+    }
+
+    const filtered = currentStudentsList.filter(student => {
+        const name = (student.fullName || student.full_name || '').toLowerCase();
+        const inst = (student.institution || '').toLowerCase();
+        const level = (student.eduLevel || student.edu_level || '').toLowerCase();
+        const year = (student.yearOfStudy || student.year_of_study || '').toLowerCase();
+        const phone = (student.phone || student.phone_number || '').toLowerCase();
+
+        return name.includes(query) || 
+               inst.includes(query) || 
+               level.includes(query) || 
+               year.includes(query) || 
+               phone.includes(query);
+    });
+
     renderTable(filtered);
 }
 
-// Export to CSV
+// Export Table Data to Downloadable CSV file (kinondoni_field_students.csv)
 function exportCSV() {
-    const students = JSON.parse(localStorage.getItem('field_students')) || [];
+    const students = currentStudentsList.length > 0 
+        ? currentStudentsList 
+        : (JSON.parse(localStorage.getItem('field_students')) || []);
+
     if (students.length === 0) {
-        alert('No data to export.');
+        alert('No student records available to export.');
         return;
     }
 
-    let csvContent = "data:text/csv;charset=utf-8,Full Name,Institution,Level,Year,Start Date,End Date,Phone\n";
-    
+    let csvContent = "data:text/csv;charset=utf-8,Full Name,Institution,Level,Year of Study,Start Date,End Date,Phone,Status\n";
+
+    const today = new Date().setHours(0, 0, 0, 0);
+
     students.forEach(s => {
-        csvContent += `"${s.fullName}","${s.institution}","${s.eduLevel}","${s.yearOfStudy}","${s.startDate}","${s.endDate}","${s.phone}"\n`;
+        const fullName = (s.fullName || s.full_name || '').replace(/"/g, '""');
+        const inst = (s.institution || '').replace(/"/g, '""');
+        const level = (s.eduLevel || s.edu_level || '').replace(/"/g, '""');
+        const year = (s.yearOfStudy || s.year_of_study || '').replace(/"/g, '""');
+        const start = s.startDate || s.start_date || '';
+        const end = s.endDate || s.end_date || '';
+        const phone = (s.phone || s.phone_number || '').replace(/"/g, '""');
+
+        const endDateVal = end ? new Date(end).setHours(0, 0, 0, 0) : 0;
+        const status = today <= endDateVal ? 'Active' : 'Completed';
+
+        csvContent += `"${fullName}","${inst}","${level}","${year}","${start}","${end}","${phone}","${status}"\n`;
     });
 
     const encodedUri = encodeURI(csvContent);
@@ -244,56 +328,63 @@ function exportCSV() {
     document.body.removeChild(link);
 }
 
-function escapeHtml(str) {
-    return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-}
-
-// Sidebar Open/Close Toggle with persistence and responsive handling
-document.addEventListener('DOMContentLoaded', () => {
+// Handle Sidebar Collapse Toggling and State Persistence via localStorage.getItem('sidebarClosed')
+function setupSidebarToggle() {
     const toggleBtn = document.getElementById('sidebarToggle');
     const appLayout = document.querySelector('.app-layout');
-    const navbar = document.querySelector('.navbar');
-    const mainContent = document.querySelector('.main-content');
 
     if (!appLayout) return;
 
-    // Restore saved state (persist collapsed/expanded between reloads)
-    const savedClosed = localStorage.getItem('sidebarClosed') === 'true';
-    if (savedClosed) appLayout.classList.add('sidebar-closed');
+    // Restore saved sidebar collapsed state
+    const isClosed = localStorage.getItem('sidebarClosed') === 'true';
+    if (isClosed) {
+        appLayout.classList.add('sidebar-closed');
+    }
 
-    const updateAria = () => {
-        if (!toggleBtn) return;
-        const isClosed = appLayout.classList.contains('sidebar-closed');
-        toggleBtn.setAttribute('aria-expanded', String(!isClosed));
-        toggleBtn.setAttribute('aria-label', isClosed ? 'Open Navigation' : 'Toggle Navigation');
-    };
-
-    // Click handler toggles class and persists state
     if (toggleBtn) {
         toggleBtn.addEventListener('click', () => {
             appLayout.classList.toggle('sidebar-closed');
-            const isClosed = appLayout.classList.contains('sidebar-closed');
-            localStorage.setItem('sidebarClosed', isClosed ? 'true' : 'false');
-            updateAria();
+            const closedNow = appLayout.classList.contains('sidebar-closed');
+            localStorage.setItem('sidebarClosed', closedNow ? 'true' : 'false');
+            
+            toggleBtn.setAttribute('aria-expanded', String(!closedNow));
+            toggleBtn.setAttribute('aria-label', closedNow ? 'Open Navigation' : 'Toggle Navigation');
         });
     }
 
-    // Ensure responsive behavior: on small screens keep sidebar expanded (full-width top nav)
-    const handleResize = () => {
+    // Responsive window resize handling
+    window.addEventListener('resize', () => {
         if (window.innerWidth <= 768) {
             appLayout.classList.remove('sidebar-closed');
-            localStorage.setItem('sidebarClosed', 'false');
-            if (navbar) {
-                navbar.style.left = '';
-                navbar.style.width = '';
+        } else {
+            if (localStorage.getItem('sidebarClosed') === 'true') {
+                appLayout.classList.add('sidebar-closed');
             }
-            if (mainContent) mainContent.style.marginLeft = '';
         }
-    };
+    });
+}
 
-    window.addEventListener('resize', handleResize);
-    handleResize();
+// Helper to escape HTML characters
+function escapeHtml(str) {
+    if (typeof str !== 'string') return '';
+    return str
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
 
-    // Initialize aria attributes
-    updateAria();
-});
+// Display UI Alert Messages
+function showAlert(elementId, message, type = 'error') {
+    const box = document.getElementById(elementId);
+    if (!box) return;
+
+    box.style.display = 'block';
+    box.className = `alert-box alert-${type}`;
+    box.textContent = message;
+
+    setTimeout(() => {
+        box.style.display = 'none';
+    }, 5000);
+}
