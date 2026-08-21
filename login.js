@@ -1,44 +1,88 @@
+// Field Student Enrollment System - Auth & Login Logic (login.js)
+
 document.addEventListener('DOMContentLoaded', () => {
-    // Redirect to dashboard if session active
-    if (sessionStorage.getItem('isLoggedIn') === 'true' && window.location.pathname.includes('login.html')) {
-        window.location.href = 'home.php';
+    const currentPath = window.location.pathname;
+
+    // Session Guard for login.html: if already logged in, redirect to dashboard
+    if (sessionStorage.getItem('isLoggedIn') === 'true' && (currentPath.includes('login.html') || currentPath.endsWith('/'))) {
+        window.location.href = 'report.php';
+        return;
     }
 
+    // Attach handler to login form if present
     const loginForm = document.getElementById('loginForm');
     if (loginForm) {
         loginForm.addEventListener('submit', handleLogin);
     }
 });
 
-function handleLogin(e) {
-    e.preventDefault();
-
-    const usernameInput = document.getElementById('username').value.trim();
-    const passwordInput = document.getElementById('password').value.trim();
-    const alertBox = document.getElementById('loginAlert');
-
-    // Default Demo Credentials
-    const validUsername = 'admin';
-    const validPassword = 'admin123';
-
-    if (usernameInput === validUsername && passwordInput === validPassword) {
-        sessionStorage.setItem('isLoggedIn', 'true');
-        sessionStorage.setItem('loggedInUser', 'Training Officer');
-        window.location.href = 'home.php';
-    } else {
-        alertBox.style.display = 'block';
-        alertBox.textContent = 'Invalid username or password. Try admin / admin123';
-    }
-}
-
-// Session Guard for Protected Pages
+// Session Guard for Protected Pages (report.php, add_enrollment.php, enrolled_list.php, profile.php)
 function checkAuth() {
-    if (sessionStorage.getItem('isLoggedIn') !== 'true') {
+    const currentPath = window.location.pathname;
+    const isLoginPage = currentPath.includes('login.html') || currentPath.includes('register.php');
+
+    if (!isLoginPage && sessionStorage.getItem('isLoggedIn') !== 'true') {
         window.location.href = 'login.html';
     }
 }
 
-// Logout Functionality
+// Handle Sign In Authentication
+async function handleLogin(e) {
+    e.preventDefault();
+
+    const usernameInput = document.getElementById('username');
+    const passwordInput = document.getElementById('password');
+    const alertBox = document.getElementById('loginAlert');
+
+    const username = usernameInput ? usernameInput.value.trim() : '';
+    const password = passwordInput ? passwordInput.value.trim() : '';
+
+    if (!username || !password) {
+        if (alertBox) {
+            alertBox.style.display = 'block';
+            alertBox.textContent = 'Please enter both username and password.';
+        }
+        return;
+    }
+
+    // 1. Demo Credentials Authentication (admin / admin123)
+    if (username === 'admin' && password === 'admin123') {
+        sessionStorage.setItem('isLoggedIn', 'true');
+        sessionStorage.setItem('loggedInUser', 'Training Officer (Admin)');
+        window.location.href = 'report.php';
+        return;
+    }
+
+    // 2. Database User Authentication via REST API
+    try {
+        const response = await fetch('api.php?action=login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username, password })
+        });
+
+        const result = await response.json();
+
+        if (response.ok && result.status === 'success') {
+            sessionStorage.setItem('isLoggedIn', 'true');
+            sessionStorage.setItem('loggedInUser', result.user?.username || 'Training Officer');
+            window.location.href = 'report.php';
+        } else {
+            if (alertBox) {
+                alertBox.style.display = 'block';
+                alertBox.textContent = result.message || 'Invalid username or password. Demo login: admin / admin123';
+            }
+        }
+    } catch (error) {
+        console.warn('API login call error:', error);
+        if (alertBox) {
+            alertBox.style.display = 'block';
+            alertBox.textContent = 'Authentication error. Please try admin / admin123 for demo mode.';
+        }
+    }
+}
+
+// Sign-Out / Session Destruction Function
 function logout() {
     sessionStorage.removeItem('isLoggedIn');
     sessionStorage.removeItem('loggedInUser');
