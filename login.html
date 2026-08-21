@@ -3,13 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - Field Student Enrollment System</title>
+    <title>Login - Field Student Enrollment System | Kinondoni MC HQ</title>
     <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 </head>
 <body class="login-body">
 
     <div class="login-card">
         <div class="login-header">
+            <img src="LOGO.png" alt="Kinondoni MC Logo" class="login-logo">
             <h2>Kinondoni Municipal Council HQ</h2>
             <p>Field Student Enrollment Portal</p>
         </div>
@@ -19,7 +23,7 @@
         <form id="loginForm">
             <div class="form-group">
                 <label for="username">Username / Official Email</label>
-                <input type="text" id="username" required placeholder="e.g. training.officer" autocomplete="username">
+                <input type="text" id="username" required placeholder="e.g. admin or training.officer" autocomplete="username">
             </div>
 
             <div class="form-group">
@@ -27,18 +31,15 @@
                 <input type="password" id="password" required placeholder="••••••••" autocomplete="current-password">
             </div>
 
-            <div style="display: flex; gap: 10px; margin-top: 15px;">
-                <button type="submit" id="loginBtn" class="btn btn-primary" style="margin-top: 0;">Sign In</button>
-                <button type="button" id="registerBtn" class="btn btn-secondary" style="width: 100%;"><a href="register.php" style="text-decoration: none; color: inherit;">Register</a></button>
+            <div style="display: flex; flex-direction: column; gap: 12px; margin-top: 20px;">
+                <button type="submit" id="loginBtn" class="btn btn-primary">Sign In</button>
+                <a href="register.php" class="btn btn-secondary" style="text-align: center; text-decoration: none;">Register / Sign Up</a>
             </div>
         </form>
 
         <div class="login-footer">
             <p>Restricted to authorized Training Officers & IT Staff.</p>
-        </div>
-        <div class="login-footer">
-            <p>Restricted to authorized Training Officers & IT Staff.</p>
-            <p><small>Default credentials: <strong>admin</strong> / <strong>admin123</strong></small></p>
+            <p style="margin-top: 6px;"><small>Default Demo Credentials: <strong>admin</strong> / <strong>admin123</strong></small></p>
         </div>
     </div>
 
