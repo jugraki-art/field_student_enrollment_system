@@ -1,9 +1,9 @@
 <?php 
-require_once __DIR__ . '/nav.php';
+require_once __DIR__ . '/../../includes/nav.php';
 ?>
 
 <div class="main-content">
-    <?php require_once __DIR__ . '/header.php'; ?>
+    <?php require_once __DIR__ . '/../../includes/header.php'; ?>
 
     <div class="main-container">
         <!-- Breadcrumb / Header Bar -->
@@ -12,7 +12,7 @@ require_once __DIR__ . '/nav.php';
                 <h2>Enroll New Field Student</h2>
                 <p class="muted">Enter student personal and practical training placement details.</p>
             </div>
-            <a href="enrolled_list.php" class="btn btn-secondary">
+            <a href="<?php echo htmlspecialchars($base_url); ?>/modules/enrollment/enrolled_list.php" class="btn btn-secondary">
                 <span>📋 View All Enrolled Records</span>
             </a>
         </div>
@@ -81,7 +81,7 @@ require_once __DIR__ . '/nav.php';
     </div>
 </div>
 
-<script src="login.js"></script>
-<script src="app.js"></script>
+<script src="<?php echo htmlspecialchars($base_url); ?>/assets/js/login.js"></script>
+<script src="<?php echo htmlspecialchars($base_url); ?>/assets/js/app.js"></script>
 </body>
 </html>
