@@ -36,7 +36,7 @@ async function loadStudents() {
     if (!tbody) return;
 
     try {
-        const response = await fetch('api.php?action=students');
+        const response = await fetch(getAppUrl('config/api.php?action=students'));
         if (!response.ok) {
             throw new Error(`API fetch failed with status ${response.status}`);
         }
@@ -172,7 +172,7 @@ async function handleFormSubmit(e) {
     };
 
     try {
-        const response = await fetch('api.php', {
+        const response = await fetch(getAppUrl('config/api.php'), {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload)
@@ -189,7 +189,7 @@ async function handleFormSubmit(e) {
 
             // Redirect to enrolled list view after successful enrollment
             setTimeout(() => {
-                window.location.href = 'enrolled_list.php';
+                window.location.href = getAppUrl('modules/enrollment/enrolled_list.php');
             }, 800);
         } else {
             throw new Error(result.message || 'Error processing enrollment');
@@ -217,7 +217,7 @@ async function handleFormSubmit(e) {
 
         alert('Student enrolled locally (Offline fallback mode).');
         document.getElementById('enrollmentForm').reset();
-        window.location.href = 'enrolled_list.php';
+        window.location.href = getAppUrl('modules/enrollment/enrolled_list.php');
     }
 }
 
@@ -229,7 +229,7 @@ async function deleteStudent(id, index) {
 
     try {
         // Perform server-side HTTP DELETE call to api.php
-        const response = await fetch(`api.php?id=${encodeURIComponent(id)}`, {
+        const response = await fetch(`${getAppUrl('config/api.php')}?id=${encodeURIComponent(id)}`, {
             method: 'DELETE',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ id: id })
