@@ -55,8 +55,43 @@ $method = $_SERVER['REQUEST_METHOD'];
 switch($method) {
     case 'GET':
         $action = $_GET['action'] ?? 'students';
-        
-        if ($action === 'students') {
+
+        if ($action === 'profile') {
+            $username = trim($_GET['username'] ?? '');
+            if ($username === '') {
+                http_response_code(400);
+                echo json_encode(["status" => "error", "message" => "Username is required."]);
+                exit;
+            }
+
+            $stmt = $conn->prepare("SELECT username, position, phone_number FROM users WHERE username = ?");
+            if (!$stmt) {
+                http_response_code(500);
+                echo json_encode(["status" => "error", "message" => "Profile query could not be prepared."]);
+                exit;
+            }
+
+            $stmt->bind_param('s', $username);
+            $stmt->execute();
+            $result = $stmt->get_result();
+            $user = $result->fetch_assoc();
+            $stmt->close();
+
+            if (!$user) {
+                http_response_code(404);
+                echo json_encode(["status" => "error", "message" => "User profile not found."]);
+                exit;
+            }
+
+            echo json_encode([
+                "status" => "success",
+                "user" => [
+                    "username" => $user['username'],
+                    "position" => $user['position'],
+                    "phone" => $user['phone_number']
+                ]
+            ]);
+        } elseif ($action === 'students') {
             $result = $conn->query("SELECT * FROM field_students ORDER BY student_id DESC");
             if ($result === false) {
                 http_response_code(500);
