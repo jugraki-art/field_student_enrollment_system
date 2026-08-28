@@ -1,5 +1,7 @@
 <?php
 // Registration page for Kinondoni Municipal Council HQ Field Student System
+require_once __DIR__ . '/../../config/paths.php';
+$base_url = app_base_url();
 $host = "localhost";
 $user = "root";
 $pass = "";
@@ -66,7 +68,7 @@ if ($conn && !$conn->connect_error) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Register - Field Student Enrollment System | Kinondoni MC HQ</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="<?php echo htmlspecialchars($base_url); ?>/assets/css/style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -75,7 +77,7 @@ if ($conn && !$conn->connect_error) {
 
     <div class="login-card">
         <div class="login-header">
-            <img src="LOGO.png" alt="Kinondoni MC Logo" class="login-logo">
+            <img src="<?php echo htmlspecialchars($base_url); ?>/Images/KMC.png" alt="Kinondoni MC Logo" class="login-logo">
             <h2>Kinondoni Municipal Council HQ</h2>
             <p>Training Officer Registration Portal</p>
         </div>
@@ -118,6 +120,7 @@ if ($conn && !$conn->connect_error) {
         </div>
     </div>
 
-    <script src="login.js"></script>
+    <script>window.APP_BASE_URL = <?php echo json_encode($base_url); ?>;</script>
+    <script src="<?php echo htmlspecialchars($base_url); ?>/assets/js/login.js"></script>
 </body>
 </html>
