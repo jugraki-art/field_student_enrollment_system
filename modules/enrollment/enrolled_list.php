@@ -1,9 +1,9 @@
 <?php 
-require_once __DIR__ . '/nav.php';
+require_once __DIR__ . '/../../includes/nav.php';
 ?>
 
 <div class="main-content">
-    <?php require_once __DIR__ . '/header.php'; ?>
+    <?php require_once __DIR__ . '/../../includes/header.php'; ?>
 
     <div class="main-container">
         <!-- Records Table Card -->
@@ -18,7 +18,7 @@ require_once __DIR__ . '/nav.php';
                     <button class="btn btn-secondary" onclick="exportCSV()">
                         <span>📥 Export CSV</span>
                     </button>
-                    <a href="add_enrollment.php" class="btn btn-primary" style="text-decoration:none; display:inline-flex; align-items:center; justify-content:center;">
+                    <a href="<?php echo htmlspecialchars($base_url); ?>/modules/enrollment/add_enrollment.php" class="btn btn-primary" style="text-decoration:none; display:inline-flex; align-items:center; justify-content:center;">
                         <span>+ Enroll Student</span>
                     </a>
                 </div>
@@ -52,7 +52,7 @@ require_once __DIR__ . '/nav.php';
     </div>
 </div>
 
-<script src="login.js"></script>
-<script src="app.js"></script>
+<script src="<?php echo htmlspecialchars($base_url); ?>/assets/js/login.js"></script>
+<script src="<?php echo htmlspecialchars($base_url); ?>/assets/js/app.js"></script>
 </body>
 </html>

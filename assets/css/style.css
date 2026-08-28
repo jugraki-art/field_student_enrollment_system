@@ -321,6 +321,7 @@ body {
 
 .welcome-banner {
     background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+    backdrop-filter: blur(10px);
     color: #ffffff;
     border: 1px solid #334155;
     display: flex;
@@ -752,3 +753,6 @@ tr:hover {
         width: 100%;
     }
 }
+
+
+

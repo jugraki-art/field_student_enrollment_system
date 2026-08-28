@@ -1,9 +1,9 @@
 <?php 
-require_once __DIR__ . '/nav.php'; 
+require_once __DIR__ . '/../../includes/nav.php';
 ?>
 
 <div class="main-content">
-    <?php require_once __DIR__ . '/header.php'; ?>
+    <?php require_once __DIR__ . '/../../includes/header.php'; ?>
 
     <div class="main-container">
         <!-- Dashboard Welcome & Quick Action Cards -->
@@ -13,11 +13,11 @@ require_once __DIR__ . '/nav.php';
                 <p>Manage and monitor field student practical training placements across municipal departments.</p>
             </div>
             <div class="quick-actions">
-                <a href="add_enrollment.php" class="btn btn-primary quick-btn">
-                    <span class="btn-icon">➕</span> Enroll New Student
+                <a href="<?php echo htmlspecialchars($base_url); ?>/modules/enrollment/add_enrollment.php" class="btn btn-primary quick-btn">
+                    <span class="btn-icon"><img src="<?php echo htmlspecialchars($base_url); ?>/Images/plus.svg" alt="Add Enrollment"></span> Enroll New Student
                 </a>
-                <a href="enrolled_list.php" class="btn btn-secondary quick-btn">
-                    <span class="btn-icon">📋</span> View Enrolled Records
+                <a href="<?php echo htmlspecialchars($base_url); ?>/modules/enrollment/enrolled_list.php" class="btn btn-secondary quick-btn">
+                    <span class="btn-icon"><img src="<?php echo htmlspecialchars($base_url); ?>/Images/clipboard.svg" alt="Records"></span> View Enrolled Records
                 </a>
             </div>
         </section>
@@ -249,7 +249,7 @@ require_once __DIR__ . '/nav.php';
     document.addEventListener('DOMContentLoaded', renderCharts);
 </script>
 
-<script src="login.js"></script>
-<script src="app.js"></script>
+<script src="<?php echo htmlspecialchars($base_url); ?>/assets/js/login.js"></script>
+<script src="<?php echo htmlspecialchars($base_url); ?>/assets/js/app.js"></script>
 </body>
 </html>

@@ -1,9 +1,15 @@
 <?php
-require_once __DIR__ . '/nav.php';
+require_once __DIR__ . '/../config/paths.php';
+$base_url = app_base_url();
+require_once __DIR__ . '/../includes/nav.php';
+
+if (!isset($conn) && file_exists(__DIR__ . '/../config/db.php')) {
+    require_once __DIR__ . '/../config/db.php';
+}
 ?>
 
 <div class="main-content">
-    <?php require_once __DIR__ . '/header.php'; ?>
+    <?php require_once __DIR__ . '/../includes/header.php'; ?>
 
     <div class="main-container">
         <div class="page-header">
@@ -18,14 +24,14 @@ require_once __DIR__ . '/nav.php';
 
             <div class="profile-grid">
                 <div class="profile-photo">
-                    <img id="profileAvatar" src="user.svg" alt="Profile Avatar" width="120" height="120" style="border-radius:12px; border:3px solid #e2e8f0;">
+                    <img id="profileAvatar" src="<?php echo htmlspecialchars($base_url); ?>/Images/user.svg" alt="Profile Avatar" width="120" height="120" style="border-radius:12px; border:3px solid #e2e8f0;">
                 </div>
                 <div class="profile-info">
                     <h2 id="displayName">Training Officer</h2>
                     <p class="muted" id="displayRole"><b>Role:</b> Training Officer</p>
-                    <p id="displayDept"><b>Department:</b> IT & Training Office</p>
-                    <p id="displayEmail"><b>Email:</b> training@kinondoni.go.tz</p>
-                    <p id="displayPhone"><b>Phone:</b> 0712345678</p>
+                    <p id="displayDept"><b>Department:</b>IT & Training Office</p>
+                    <p id="displayEmail"><b>Email:</b>training@kinondoni.go.tz</p>
+                    <p id="displayPhone"><b>Phone:</b></p>
 
                     <div style="margin-top:16px;">
                         <button id="editBtn" class="btn btn-secondary">Edit Profile</button>
@@ -79,7 +85,7 @@ require_once __DIR__ . '/nav.php';
 <script>
 document.addEventListener('DOMContentLoaded', () => {
     const defaults = {
-        name: sessionStorage.getItem('loggedInUser') || 'Training Officer',
+        name: 'Training Officer',
         role: 'Training Officer',
         dept: 'IT & Training Office',
         email: 'training@kinondoni.go.tz',
@@ -87,8 +93,32 @@ document.addEventListener('DOMContentLoaded', () => {
         bio: 'Responsible for coordinating field student practical training placements and managing enrollment records for Kinondoni Municipal Council HQ.'
     };
 
-    const saved = JSON.parse(localStorage.getItem('profile_training_officer') || '{}');
-    const profile = Object.assign({}, defaults, saved);
+    const profile = Object.assign({}, defaults);
+
+    const applyProfile = (user) => {
+        Object.assign(profile, {
+            name: user.username || defaults.name,
+            role: user.position || defaults.role,
+            phone: user.phone || defaults.phone
+        });
+
+        document.getElementById('displayName').textContent = profile.name;
+        document.getElementById('displayRole').innerHTML = '<b>Role:</b> ' + profile.role;
+        document.getElementById('displayPhone').innerHTML = '<b>Phone:</b> ' + profile.phone;
+        document.getElementById('inputName').value = profile.name;
+        document.getElementById('inputRole').value = profile.role;
+        document.getElementById('inputPhone').value = profile.phone;
+    };
+
+    const username = sessionStorage.getItem('loggedInUser');
+    if (username) {
+        fetch(getAppUrl(`config/api.php?action=profile&username=${encodeURIComponent(username)}`))
+            .then((response) => response.ok ? response.json() : Promise.reject(new Error('Profile request failed')))
+            .then((result) => {
+                if (result.status === 'success') applyProfile(result.user);
+            })
+            .catch((error) => console.warn('Profile API call error:', error));
+    }
 
     document.getElementById('displayName').textContent = profile.name;
     document.getElementById('displayRole').innerHTML = '<b>Role:</b> ' + profile.role;
@@ -125,8 +155,6 @@ document.addEventListener('DOMContentLoaded', () => {
             bio: document.getElementById('inputBio').value.trim() || defaults.bio
         };
 
-        localStorage.setItem('profile_training_officer', JSON.stringify(updated));
-
         document.getElementById('displayName').textContent = updated.name;
         document.getElementById('displayRole').innerHTML = '<b>Role:</b> ' + updated.role;
         document.getElementById('displayDept').innerHTML = '<b>Department:</b> ' + updated.dept;
@@ -142,7 +170,7 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 </script>
 
-<script src="login.js"></script>
-<script src="app.js"></script>
+<script src="<?php echo htmlspecialchars($base_url); ?>/assets/js/login.js"></script>
+<script src="<?php echo htmlspecialchars($base_url); ?>/assets/js/app.js"></script>
 </body>
 </html>

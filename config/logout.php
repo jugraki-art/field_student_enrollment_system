@@ -13,7 +13,7 @@ session_destroy();
     <script>
         sessionStorage.removeItem('isLoggedIn');
         sessionStorage.removeItem('loggedInUser');
-        window.location.href = 'login.html';
+        window.location.href = '../modules/login/login.html';
     </script>
 </body>
 </html>
