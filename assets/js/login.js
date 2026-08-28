@@ -1,11 +1,22 @@
 // Field Student Enrollment System - Auth & Login Logic (login.js)
 
+function getAppUrl(path = '') {
+    let baseUrl = window.APP_BASE_URL;
+
+    if (typeof baseUrl !== 'string') {
+        const script = Array.from(document.scripts).find((item) => /\/assets\/js\/(app|login)\.js(?:\?|$)/.test(item.src));
+        baseUrl = script ? new URL('../../', script.src).pathname.replace(/\/$/, '') : '';
+    }
+
+    return `${baseUrl}${path ? `/${path.replace(/^\//, '')}` : ''}` || '/';
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     const currentPath = window.location.pathname;
 
     // Session Guard for login.html: if already logged in, redirect to dashboard
     if (sessionStorage.getItem('isLoggedIn') === 'true' && (currentPath.includes('login.html') || currentPath.endsWith('/'))) {
-        window.location.href = 'report.php';
+        window.location.href = getAppUrl('modules/dashboard/report.php');
         return;
     }
 
@@ -22,7 +33,7 @@ function checkAuth() {
     const isLoginPage = currentPath.includes('login.html') || currentPath.includes('register.php');
 
     if (!isLoginPage && sessionStorage.getItem('isLoggedIn') !== 'true') {
-        window.location.href = 'login.html';
+        window.location.href = getAppUrl('modules/login/login.html');
     }
 }
 
@@ -49,13 +60,13 @@ async function handleLogin(e) {
     if (username === 'admin' && password === 'admin123') {
         sessionStorage.setItem('isLoggedIn', 'true');
         sessionStorage.setItem('loggedInUser', 'Training Officer (Admin)');
-        window.location.href = 'report.php';
+        window.location.href = getAppUrl('modules/dashboard/report.php');
         return;
     }
 
     // 2. Database User Authentication via REST API
     try {
-        const response = await fetch('api.php?action=login', {
+        const response = await fetch(getAppUrl('config/api.php?action=login'), {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ username, password })
@@ -66,7 +77,7 @@ async function handleLogin(e) {
         if (response.ok && result.status === 'success') {
             sessionStorage.setItem('isLoggedIn', 'true');
             sessionStorage.setItem('loggedInUser', result.user?.username || 'Training Officer');
-            window.location.href = 'report.php';
+            window.location.href = getAppUrl('modules/dashboard/report.php');
         } else {
             if (alertBox) {
                 alertBox.style.display = 'block';
@@ -86,5 +97,5 @@ async function handleLogin(e) {
 function logout() {
     sessionStorage.removeItem('isLoggedIn');
     sessionStorage.removeItem('loggedInUser');
-    window.location.href = 'logout.php';
+    window.location.href = getAppUrl('config/logout.php');
 }
