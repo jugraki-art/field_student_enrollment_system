@@ -33,6 +33,7 @@ $conn->query("CREATE TABLE IF NOT EXISTS field_students (
     student_id INT AUTO_INCREMENT PRIMARY KEY,
     full_name VARCHAR(150) NOT NULL,
     institution VARCHAR(150) NOT NULL,
+    program VARCHAR(150) NOT NULL,
     edu_level ENUM('Certificate', 'Diploma', 'Degree') NOT NULL,
     year_of_study ENUM('Year 1', 'Year 2', 'Year 3', 'Year 4') NOT NULL,
     start_date DATE NOT NULL,
@@ -40,6 +41,12 @@ $conn->query("CREATE TABLE IF NOT EXISTS field_students (
     phone_number VARCHAR(20) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
+
+// Ensure older databases created before the `program` column was added still work.
+$programCheck = $conn->query("SHOW COLUMNS FROM field_students LIKE 'program'");
+if ($programCheck && $programCheck->num_rows === 0) {
+    $conn->query("ALTER TABLE field_students ADD COLUMN program VARCHAR(150) NOT NULL DEFAULT '' AFTER institution");
+}
 
 $conn->query("CREATE TABLE IF NOT EXISTS users (
     user_id INT AUTO_INCREMENT PRIMARY KEY,
@@ -106,6 +113,7 @@ switch($method) {
                     "id"         => (int)$row["student_id"],
                     "fullName"   => $row["full_name"],
                     "institution"=> $row["institution"],
+                    "program"    => $row["program"],
                     "eduLevel"   => $row["edu_level"],
                     "yearOfStudy"=> $row["year_of_study"],
                     "startDate"  => $row["start_date"],
@@ -210,13 +218,14 @@ switch($method) {
             // Default POST: Insert Student
             $fullName   = isset($data['fullName']) ? trim($data['fullName']) : '';
             $institution= isset($data['institution']) ? trim($data['institution']) : '';
+            $program    = isset($data['program']) ? trim($data['program']) : '';
             $eduLevel   = isset($data['eduLevel']) ? trim($data['eduLevel']) : '';
             $yearOfStudy= isset($data['yearOfStudy']) ? trim($data['yearOfStudy']) : '';
             $startDate  = isset($data['startDate']) ? trim($data['startDate']) : '';
             $endDate    = isset($data['endDate']) ? trim($data['endDate']) : '';
             $phone      = isset($data['phone']) ? trim($data['phone']) : '';
 
-            if (empty($fullName) || empty($institution) || empty($startDate) || empty($endDate) || empty($phone)) {
+            if (empty($fullName) || empty($institution) || empty($program) || empty($startDate) || empty($endDate) || empty($phone)) {
                 http_response_code(400);
                 echo json_encode(["status" => "error", "message" => "All required fields must be filled."]);
                 exit;
@@ -232,15 +241,16 @@ switch($method) {
             // Escape input strings for fallback / safety
             $escapedFullName   = $conn->real_escape_string($fullName);
             $escapedInstitution= $conn->real_escape_string($institution);
+            $escapedProgram    = $conn->real_escape_string($program);
             $escapedEduLevel   = $conn->real_escape_string($eduLevel);
             $escapedYear       = $conn->real_escape_string($yearOfStudy);
             $escapedStart      = $conn->real_escape_string($startDate);
             $escapedEnd        = $conn->real_escape_string($endDate);
             $escapedPhone      = $conn->real_escape_string($phone);
 
-            $stmt = $conn->prepare("INSERT INTO field_students (full_name, institution, edu_level, year_of_study, start_date, end_date, phone_number) VALUES (?, ?, ?, ?, ?, ?, ?)");
+            $stmt = $conn->prepare("INSERT INTO field_students (full_name, institution, program, edu_level, year_of_study, start_date, end_date, phone_number) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
             if ($stmt) {
-                $stmt->bind_param('sssssss', $fullName, $institution, $eduLevel, $yearOfStudy, $startDate, $endDate, $phone);
+                $stmt->bind_param('ssssssss', $fullName, $institution, $program, $eduLevel, $yearOfStudy, $startDate, $endDate, $phone);
                 if ($stmt->execute()) {
                     echo json_encode(["status" => "success", "message" => "Student enrolled successfully.", "id" => $conn->insert_id]);
                 } else {
@@ -249,8 +259,8 @@ switch($method) {
                 }
                 $stmt->close();
             } else {
-                $sql = "INSERT INTO field_students (full_name, institution, edu_level, year_of_study, start_date, end_date, phone_number) 
-                        VALUES ('$escapedFullName', '$escapedInstitution', '$escapedEduLevel', '$escapedYear', '$escapedStart', '$escapedEnd', '$escapedPhone')";
+                $sql = "INSERT INTO field_students (full_name, institution, program, edu_level, year_of_study, start_date, end_date, phone_number) 
+                        VALUES ('$escapedFullName', '$escapedInstitution', '$escapedProgram', '$escapedEduLevel', '$escapedYear', '$escapedStart', '$escapedEnd', '$escapedPhone')";
                 if ($conn->query($sql)) {
                     echo json_encode(["status" => "success", "message" => "Student enrolled successfully.", "id" => $conn->insert_id]);
                 } else {
