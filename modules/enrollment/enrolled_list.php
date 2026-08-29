@@ -33,7 +33,11 @@ require_once __DIR__ . '/../../includes/nav.php';
                             <th>Student Name</th>
                             <th>Institution</th>
                             <th>Level / Year</th>
+                            <th>Program</th>
                             <th>Training Period</th>
+                            <th>Duration/th>
+                            <th>Completed/th>
+                            <th>Remains</th>
                             <th>Contact</th>
                             <th>Status</th>
                             <th>Actions</th>
@@ -41,7 +45,7 @@ require_once __DIR__ . '/../../includes/nav.php';
                     </thead>
                     <tbody id="studentTableBody">
                         <tr>
-                            <td colspan="7" style="text-align:center; padding:30px; color:#94a3b8;">
+                            <td colspan="11" style="text-align:center; padding:30px; color:#94a3b8;">
                                 Loading enrolled student records...
                             </td>
                         </tr>
