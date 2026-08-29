@@ -8,6 +8,7 @@ CREATE TABLE IF NOT EXISTS field_students (
     student_id INT AUTO_INCREMENT PRIMARY KEY,
     full_name VARCHAR(150) NOT NULL,
     institution VARCHAR(150) NOT NULL,
+    program VARCHAR(150) NOT NULL,
     edu_level ENUM('Certificate', 'Diploma', 'Degree') NOT NULL,
     year_of_study ENUM('Year 1', 'Year 2', 'Year 3', 'Year 4') NOT NULL,
     start_date DATE NOT NULL,
