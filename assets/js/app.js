@@ -70,7 +70,7 @@ function renderTable(students) {
     const today = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
 
     if (!Array.isArray(students) || students.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; color:#94a3b8; padding:30px;">No field students enrolled yet.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="11" style="text-align:center; color:#94a3b8; padding:30px;">No field students enrolled yet.</td></tr>`;
         return;
     }
 
@@ -78,6 +78,7 @@ function renderTable(students) {
         const id = student.student_id || student.id || (index + 1);
         const fullName = escapeHtml(student.fullName || student.full_name || '');
         const institution = escapeHtml(student.institution || '');
+        const program = escapeHtml(student.program || '');
         const eduLevel = escapeHtml(student.eduLevel || student.edu_level || '');
         const yearOfStudy = escapeHtml(student.yearOfStudy || student.year_of_study || '');
         const startDate = student.startDate || student.start_date || '';
@@ -96,6 +97,12 @@ function renderTable(students) {
             }
         }
 
+        const duration = startDate && endDate ? Math.floor((new Date(endDate) - new Date(startDate)) / (1000 * 60 * 60 * 24)) : 'N/A';
+        const completedDays = startDate ? Math.floor((today - new Date(startDate).getTime()) / (1000 * 60 * 60 * 24)) : 'N/A';
+        const remainingDays = endDate ? Math.max(0, Math.floor((new Date(endDate).getTime() - today) / (1000 * 60 * 60 * 24))) : 'N/A';
+        
+        
+
         const statusText = isActive ? 'Active' : 'Completed';
         const badgeClass = isActive ? 'badge-active' : 'badge-completed';
 
@@ -103,8 +110,12 @@ function renderTable(students) {
         row.innerHTML = `
             <td><strong>${fullName}</strong></td>
             <td>${institution}</td>
+            <td>${program}</td>
             <td>${eduLevel} <br><small style="color:#64748b">${yearOfStudy}</small></td>
             <td><small>${startDate} to ${endDate}</small></td>
+            <td>${duration} days</td>
+            <td>${completedDays} days</td>
+            <td>${remainingDays} days</td>
             <td>${phone}</td>
             <td><span class="status-badge ${badgeClass}">${statusText}</span></td>
             <td>
@@ -127,6 +138,7 @@ async function handleFormSubmit(e) {
 
     const fullNameInput = document.getElementById('fullName');
     const institutionInput = document.getElementById('institution');
+    const programInput = document.getElementById('program');
     const eduLevelInput = document.getElementById('eduLevel');
     const yearOfStudyInput = document.getElementById('yearOfStudy');
     const startDateInput = document.getElementById('startDate');
@@ -135,13 +147,14 @@ async function handleFormSubmit(e) {
 
     const fullName = fullNameInput ? fullNameInput.value.trim() : '';
     const institution = institutionInput ? institutionInput.value.trim() : '';
+    const program = programInput ? programInput.value.trim() : '';
     const eduLevel = eduLevelInput ? eduLevelInput.value : '';
     const yearOfStudy = yearOfStudyInput ? yearOfStudyInput.value : '';
     const startDate = startDateInput ? startDateInput.value : '';
     const endDate = endDateInput ? endDateInput.value : '';
     const phone = phoneInput ? phoneInput.value.trim() : '';
 
-    if (!fullName || !institution || !startDate || !endDate || !phone) {
+    if (!fullName || !institution || !program || !startDate || !endDate || !phone) {
         showAlert('formAlert', 'Please fill in all required form fields.', 'error');
         return;
     }
@@ -164,6 +177,7 @@ async function handleFormSubmit(e) {
     const payload = {
         fullName,
         institution,
+        program,
         eduLevel,
         yearOfStudy,
         startDate,
@@ -203,6 +217,7 @@ async function handleFormSubmit(e) {
             student_id: Date.now(),
             fullName,
             institution,
+            program,
             eduLevel,
             yearOfStudy,
             startDate,
@@ -275,12 +290,14 @@ function filterTable() {
     const filtered = currentStudentsList.filter(student => {
         const name = (student.fullName || student.full_name || '').toLowerCase();
         const inst = (student.institution || '').toLowerCase();
+        const program = (student.program || '').toLowerCase();
         const level = (student.eduLevel || student.edu_level || '').toLowerCase();
         const year = (student.yearOfStudy || student.year_of_study || '').toLowerCase();
         const phone = (student.phone || student.phone_number || '').toLowerCase();
 
         return name.includes(query) || 
                inst.includes(query) || 
+               program.includes(query) ||
                level.includes(query) || 
                year.includes(query) || 
                phone.includes(query);
@@ -307,6 +324,7 @@ function exportCSV() {
     students.forEach(s => {
         const fullName = (s.fullName || s.full_name || '').replace(/"/g, '""');
         const inst = (s.institution || '').replace(/"/g, '""');
+        const program = (s.program || '').replace(/"/g, '""');
         const level = (s.eduLevel || s.edu_level || '').replace(/"/g, '""');
         const year = (s.yearOfStudy || s.year_of_study || '').replace(/"/g, '""');
         const start = s.startDate || s.start_date || '';
@@ -316,7 +334,7 @@ function exportCSV() {
         const endDateVal = end ? new Date(end).setHours(0, 0, 0, 0) : 0;
         const status = today <= endDateVal ? 'Active' : 'Completed';
 
-        csvContent += `"${fullName}","${inst}","${level}","${year}","${start}","${end}","${phone}","${status}"\n`;
+        csvContent += `"${fullName}","${inst}","${program}","${level}","${year}","${start}","${end}","${phone}","${status}"\n`;
     });
 
     const encodedUri = encodeURI(csvContent);
