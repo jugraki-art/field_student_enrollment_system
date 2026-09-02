@@ -31,6 +31,10 @@ require_once __DIR__ . '/../../includes/nav.php';
                     <label for="institution">Uni / Institute / College <span class="req">*</span></label>
                     <input type="text" id="institution" required placeholder="e.g. UDSM, DIT, IFM, CBE, MUST">
                 </div>
+                <div class="form-group">
+                    <label for="program">Program of Study <span class="req">*</span></label>
+                    <input type="text" id="program" required placeholder="e.g. Computer Science, Business Administration">
+                </div>
 
                 <div class="form-row">
                     <div class="form-group">
