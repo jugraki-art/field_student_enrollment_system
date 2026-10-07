@@ -439,40 +439,38 @@ CREATE TABLE IF NOT EXISTS users (
 
 
 +--------------------------------------------------------------------------------------------------------------------+
-|                     LAYER 1 PHYSICAL NETWORK DIAGNOSTIC & RESTORATION FLOWCHART                                   |
+|                       WORKSTATION HARDWARE DIAGNOSTICS & OS DEPLOYMENT LIFECYCLE                                   |
 +--------------------------------------------------------------------------------------------------------------------+
 
-                          +-----------------------------------------------------------+
-                          | 1. PROBLEM IDENTIFICATION                                 |
-                          | Workstation Layer 1 outage detected across office drops.  |
-                          +-----------------------------------------------------------+
+                                      +------------------------------------+
+                                      | MUNICIPAL IT SUPPORT TICKET ENTRY  |
+                                      +------------------------------------+
+                                                        |
+            +-------------------------------------------+-------------------------------------------+
+            |                                           |                                           |
+            v                                           v                                           v
++-----------------------+                   +-----------------------+                   +-----------------------+
+|  POST BOOT LOOP FAULT |                   | POWER & DISPLAY FAULT |                   | ZERO-BYTE USB FAULT   |
++-----------------------+                   +-----------------------+                   +-----------------------+
+| 1. Inspect motherboard|                   | 1. Inspect power cable|                   | 1. Run ChipGenius to  |
+|    DDR4 DIMM slots.   |                   |    connection.        |                   |    extract VID / PID. |
+| 2. Extract wrongly    |                   | 2. Secure loose power |                   | 2. Select UMPTool mass|
+|    seated RAM sticks. |                   |    supply cords.      |                   |    production app.    |
+| 3. Polish oxidized    |                   | 3. Replace degraded/  |                   | 3. Flash microcode to |
+|    gold contact pads. |                   |    faulty VGA display |                   |    repair bad blocks. |
+| 4. Re-seat RAM module |                   |    video cables.      |                   | 4. Format exFAT via   |
+|    firmly into slot.  |                   | 4. Verify clear video |                   |    Windows `diskpart`.|
+|                       |                   |    output signal.     |                   |                       |
++-----------------------+                   +-----------------------+                   +-----------------------+
+            |                                           |                                           |
+            +-------------------------------------------+-------------------------------------------+
                                                         |
                                                         v
-                          +-----------------------------------------------------------+
-                          | 2. HARDWARE INSPECTION & DISASSEMBLY                      |
-                          | Unmount wall faceplate; replace damaged Cat6 UTP cable.   |
-                          +-----------------------------------------------------------+
+                                      +------------------------------------+
+                                      | UEFI / GPT OS DEPLOYMENT (RUFUS)   |
+                                      | Write Win 11 / Ubuntu ISO to USB   |
+                                      | Deploy Dual-Boot on NVMe Drives    |
+                                      +------------------------------------+
                                                         |
                                                         v
-                          +-----------------------------------------------------------+
-                          | 3. T568B CONDUCTOR TERMINATION                            |
-                          | Arrange pairs: W/Org, Org, W/Grn, Blu, W/Blu, Grn, W/Brn, Brn|
-                          | Punch down conductors into new modular RJ-45 keystone jack|
-                          +-----------------------------------------------------------+
-                                                        |
-                                                        v
-                          +-----------------------------------------------------------+
-                          | 4. CONTINUITY VERIFICATION                                |
-                          | Connect RJ-45 LAN Tester (Master & Remote units).         |
-                          | Verify 1-to-8 sequential LED illumination (Zero shorts).  |
-                          +-----------------------------------------------------------+
-                                                        |
-                                                        v
-                          +-----------------------------------------------------------+
-                          | 5. SWITCH & VOIP VLAN PROVISIONING                        |
-                          | Tag switch port with Voice VLAN ID for QoS priority.      |
-                          | Restore workstation DHCP IP lease & Intranet connectivity. |
-                          +-----------------------------------------------------------+
-                                                        |
-                                                        v
-                                          [ LAN LINK RESTORED & VALIDATED ]
+                                      [ WORKSTATION FULLY OPERATIONAL ]
