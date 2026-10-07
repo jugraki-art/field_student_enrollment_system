@@ -436,3 +436,43 @@ CREATE TABLE IF NOT EXISTS users (
 ---
 
 © 2026 **Kinondoni Municipal Council HQ - IT Department & Training Office**. All rights reserved. Proprietary software for municipal administrative operations.
+
+
++--------------------------------------------------------------------------------------------------------------------+
+|                     LAYER 1 PHYSICAL NETWORK DIAGNOSTIC & RESTORATION FLOWCHART                                   |
++--------------------------------------------------------------------------------------------------------------------+
+
+                          +-----------------------------------------------------------+
+                          | 1. PROBLEM IDENTIFICATION                                 |
+                          | Workstation Layer 1 outage detected across office drops.  |
+                          +-----------------------------------------------------------+
+                                                        |
+                                                        v
+                          +-----------------------------------------------------------+
+                          | 2. HARDWARE INSPECTION & DISASSEMBLY                      |
+                          | Unmount wall faceplate; replace damaged Cat6 UTP cable.   |
+                          +-----------------------------------------------------------+
+                                                        |
+                                                        v
+                          +-----------------------------------------------------------+
+                          | 3. T568B CONDUCTOR TERMINATION                            |
+                          | Arrange pairs: W/Org, Org, W/Grn, Blu, W/Blu, Grn, W/Brn, Brn|
+                          | Punch down conductors into new modular RJ-45 keystone jack|
+                          +-----------------------------------------------------------+
+                                                        |
+                                                        v
+                          +-----------------------------------------------------------+
+                          | 4. CONTINUITY VERIFICATION                                |
+                          | Connect RJ-45 LAN Tester (Master & Remote units).         |
+                          | Verify 1-to-8 sequential LED illumination (Zero shorts).  |
+                          +-----------------------------------------------------------+
+                                                        |
+                                                        v
+                          +-----------------------------------------------------------+
+                          | 5. SWITCH & VOIP VLAN PROVISIONING                        |
+                          | Tag switch port with Voice VLAN ID for QoS priority.      |
+                          | Restore workstation DHCP IP lease & Intranet connectivity. |
+                          +-----------------------------------------------------------+
+                                                        |
+                                                        v
+                                          [ LAN LINK RESTORED & VALIDATED ]
